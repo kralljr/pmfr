@@ -108,14 +108,12 @@ formatprof <- function(base, cn = NULL, constr = NULL, scale = F) {
 
   # If scale, then row standardize
   if(scale) {
-    stop("Not tested!")
     # Get row sums
     pr1 <- select(prof, -cons, -Type)
     rs <- rowSums(pr1)
 
-    # Standardize by row sums
-    div <- function(vec) {vec / rs}
-    prof <- mutate_each(prof, funs(div), -cons, -Type)
+    prof <- mutate_at(prof, vars(-cons, -Type), funs(div(., rs = rs)))
+    browser()
 
   }
   
@@ -129,6 +127,11 @@ formatprof <- function(base, cn = NULL, constr = NULL, scale = F) {
   # Return formatted profiles
   return(list(long = prof))
 }
+
+#' @title div
+#' @param vec vector of source
+#' @param rs row sums
+div <- function(vec, rs) {vec / rs}
 
 #' @rdname pmfprof
 #' @export
