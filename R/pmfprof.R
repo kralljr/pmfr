@@ -113,7 +113,7 @@ formatprof <- function(base, cn = NULL, constr = NULL, scale = F) {
     rs <- rowSums(pr1)
 
     prof <- mutate_at(prof, vars(-cons, -Type), funs(div(., rs = rs)))
-    browser()
+
 
   }
   
