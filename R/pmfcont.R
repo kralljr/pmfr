@@ -5,12 +5,12 @@
 #' These are functions to read in and format PMF output contributions
 #' 
 #' @title pmfcont
-#' @param dat full path to original constituent dataset
+#' @param dat1 full path to original constituent dataset
 #' @param dir path to PMF result
 #' @param prefix prefix of PMF result
 #' @param constrain was constrained PMF run? (default = F)
 #' @param cn optional column names for sources
-#' @param scale whether to scale by total (default = F)
+#' @param scale character of scaling variable (e.g. PM)
 #' @param rms character vector of constituents removed from PMF run
 #' @param formatdate date format if first column is date
 #' @export
@@ -25,11 +25,11 @@ pmfcont <- function(x, ...) UseMethod("pmfcont")
 
 #' @rdname pmfcont
 #' @export
-pmfcont.default <- function(dat, dir = "./", rms = NULL, prefix, constrain = F, 
-                             cn = NULL, scale = F, formatdate = "%m/%d/%Y") {
+pmfcont.default <- function(dat1, dir = "./", rms = NULL, prefix, constrain = F, 
+                             cn = NULL, scale = NULL, formatdate = "%m/%d/%Y") {
   
   # read in constituent data
-  dat <- read.table(dat, header = T)
+  dat <- read.table(dat1, header = T)
   
   # remove constituents from original data
   if(!is.null(rms)) {
@@ -41,8 +41,10 @@ pmfcont.default <- function(dat, dir = "./", rms = NULL, prefix, constrain = F,
   T <- nrow(dat)
   
   # Where to start: mean 1
-  skips1 <- ifelse(!scale, 4, 4 + T + 5)
-
+  # Read from PMF directly for scale, vs. calculate in format
+  #skips1 <- ifelse(is.null(scale), 4, 4 + T + 5)
+  skips1 <- 4
+  
   # read in PMF contribution data
   base <- read.table(file.path(dir, paste0(prefix, "_contributions.txt")), 
                      skip = skips1, nrows = T,
@@ -64,12 +66,12 @@ pmfcont.default <- function(dat, dir = "./", rms = NULL, prefix, constrain = F,
   }
   
   # If scale
-  if(scale) {
+  if(!is.null(scale)) {
      # Get profiles
-    stop("not tested!")
-     pr1 <- pmfprof(dat, dir, prefix, scale = F, rms = rms)[[1]]
+
+     pr1 <- pmfprof(dat1, dir, prefix, scale = F, rms = rms)[[1]]
      # Find PM total
-     pr1 <- dplyr::filter(pr1, cons == "FPM.Total")
+     pr1 <- dplyr::filter(pr1, cons == scale)
      pr1 <- spread(pr1, Source, value)
   
   # Else no total
@@ -78,7 +80,7 @@ pmfcont.default <- function(dat, dir = "./", rms = NULL, prefix, constrain = F,
   }
 
   # Format contributions
-  contr <- formatcontr(base, constr, cn, scale, tots = pr1, formatdate)  
+  contr <- formatcontr(base, constr, cn, tots = pr1, formatdate)  
 
   class(contr) <- "pmfcont"
   contr$call <- match.call()
@@ -97,10 +99,9 @@ pmfcont.default <- function(dat, dir = "./", rms = NULL, prefix, constrain = F,
 #' @param base base contribution data read from *_contributions.txt
 #' @param constr constrained output
 #' @param cn optional column names
-#' @param scale whether to row standardize (default = F)
 #' @param tots total PM to scale by
 #' @param formatdate date format if first column is date
-formatcontr <- function(base, constr = NULL, cn = NULL, scale = F, 
+formatcontr <- function(base, constr = NULL, cn = NULL, 
                         tots = NULL, formatdate = "%m/%d/%Y") {
   
   # Set number of sources
@@ -127,8 +128,7 @@ formatcontr <- function(base, constr = NULL, cn = NULL, scale = F,
   }
 
 
-  if(scale) {
-    stop("Not tested!")
+  if(!is.null(tots)) {
     # Which columns to ignore
     wh1 <- which(colnames(base) %in% c("ID", "Type"))
     # Multiply by total PM mass on average
@@ -178,11 +178,11 @@ print.pmfcont <- function(x) {
 #' @rdname pmfcont
 #' @export
 plot.pmfcont <- function(x, class = "scatter", type = F, 
-                             scale = F, size1 = 12, size2 = 1, ncol1 = 3) {
+                             scale = NULL, size1 = 12, size2 = 1, ncol1 = 3) {
   # type is whether to color by type, scale is whether units or scale,
   # size2 is size of points, size1 is size of text on x axis
   # Create y label
-  mlab1 <- ifelse(scale, "Concentration units", "Average = 1")
+  mlab1 <- ifelse(!is.null(scale), "Concentration units", "Average = 1")
 
   contrib <- x$contrib
   # If multiple types
@@ -199,7 +199,7 @@ plot.pmfcont <- function(x, class = "scatter", type = F,
     theme_bw() + 
     xlab("ID") + 
     ylab(paste0("Contributions, ", mlab1)) + 
-    theme(text = element_text(size = size1), axis.text.x = element_blank()) +
+    theme(text = element_text(size = size1)) +
     facet_wrap(~ Source, ncol = ncol1, scales = "free")  
   
   hist <- hist + geom_histogram(position = "identity", alpha = 0.4) +
@@ -207,7 +207,7 @@ plot.pmfcont <- function(x, class = "scatter", type = F,
     theme_bw() + 
     xlab(paste0("Contributions,", mlab1, " (log 10 scale)")) + 
     theme(text = element_text(size = 12), 
-          axis.text.x = element_text(size = 12, angle = 45, hjust = 1)) +
+          axis.text.x = element_text(size = 12)) +
     facet_wrap(~ Source, ncol = 3)  
   
   if(!type) {
@@ -229,10 +229,10 @@ plot.pmfcont <- function(x, class = "scatter", type = F,
 #' @param contrib pmf contributions
 #' @param scale whether to scale
 #' @export
-plotconstrain <- function(contrib, scale = F) {
+plotconstrain <- function(contrib, scale = NULL) {
   stop("not tested!")
   # Create y label
-  mlab1 <- ifelse(scale, "Concentration units", "Average = 1")
+  mlab1 <- ifelse(!is.null(scale), "Concentration units", "Average = 1")
 
   # Spread by type
   contrib <- spread(contrib, Type, value)
@@ -244,7 +244,7 @@ plotconstrain <- function(contrib, scale = F) {
     xlab("Base") + ylab("Constrained") +
     ggtitle(paste0("Contributions,", mlab1)) + 
     theme(text = element_text(size = 12), 
-          axis.text.x = element_text(size = 12, angle = 45, hjust = 1)) +
+          axis.text.x = element_text(size = 12)) +
     facet_wrap(~ Source, ncol = 3)  
 
   g1
