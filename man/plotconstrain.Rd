@@ -4,7 +4,7 @@
 \alias{plotconstrain}
 \title{plotconstrain}
 \usage{
-plotconstrain(contrib, scale = F)
+plotconstrain(contrib, scale = NULL)
 }
 \arguments{
 \item{contrib}{pmf contributions}

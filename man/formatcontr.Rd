@@ -4,7 +4,7 @@
 \alias{formatcontr}
 \title{formatcontr}
 \usage{
-formatcontr(base, constr = NULL, cn = NULL, scale = F, tots = NULL,
+formatcontr(base, constr = NULL, cn = NULL, tots = NULL,
   formatdate = "\%m/\%d/\%Y")
 }
 \arguments{
@@ -13,8 +13,6 @@ formatcontr(base, constr = NULL, cn = NULL, scale = F, tots = NULL,
 \item{constr}{constrained output}
 
 \item{cn}{optional column names}
-
-\item{scale}{whether to row standardize (default = F)}
 
 \item{tots}{total PM to scale by}
 

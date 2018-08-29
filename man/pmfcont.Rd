@@ -9,16 +9,17 @@
 \usage{
 pmfcont(x, ...)
 
-\method{pmfcont}{default}(dat, dir = "./", rms = NULL, prefix,
-  constrain = F, cn = NULL, scale = F, formatdate = "\%m/\%d/\%Y")
+\method{pmfcont}{default}(dat1, dir = "./", rms = NULL, prefix,
+  constrain = F, cn = NULL, scale = NULL,
+  formatdate = "\%m/\%d/\%Y")
 
 \method{print}{pmfcont}(x)
 
-\method{plot}{pmfcont}(x, class = "scatter", type = F, scale = F,
+\method{plot}{pmfcont}(x, class = "scatter", type = F, scale = NULL,
   size1 = 12, size2 = 1, ncol1 = 3)
 }
 \arguments{
-\item{dat}{full path to original constituent dataset}
+\item{dat1}{full path to original constituent dataset}
 
 \item{dir}{path to PMF result}
 
@@ -30,7 +31,7 @@ pmfcont(x, ...)
 
 \item{cn}{optional column names for sources}
 
-\item{scale}{whether to scale by total (default = F)}
+\item{scale}{character of scaling variable (e.g. PM)}
 
 \item{formatdate}{date format if first column is date}
 }
