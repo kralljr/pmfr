@@ -176,9 +176,9 @@ plot.pmfprof <- function(x, scale = T, type = F, size = 12) {
           axis.text.x = element_text(size = size, angle = 90, hjust = 1, vjust = 0.5)) +
     facet_wrap(~ Source, ncol = 1)  
 
-  if(!type) {
-    g1 <- g1 + theme(legend.position = "none")
-  }
+  # if(!type) {
+   g1 <- g1 + theme(legend.position = "top")
+  # }
   g1
 }
 
