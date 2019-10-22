@@ -26,10 +26,10 @@ pmfcont <- function(x, ...) UseMethod("pmfcont")
 #' @rdname pmfcont
 #' @export
 pmfcont.default <- function(dat1, dir = "./", rms = NULL, prefix, constrain = F, 
-                             cn = NULL, scale = NULL, formatdate = "%m/%d/%Y") {
+                             cn = NULL, scale = NULL, formatdate = "%m/%d/%Y", sep = ",") {
   
   # read in constituent data
-  dat <- read.table(dat1, header = T)
+  dat <- read.table(dat1, header = T, sep = sep)
   
   # remove constituents from original data
   if(!is.null(rms)) {
@@ -275,7 +275,7 @@ print.summary.pmfcont <- function(x) {
   cat("\n")
   cat("Number of sources:", x$nsource, "\n")
   cat("Number of observations:", x$nobs, "\n")
-  cat("Number of constituents:", x$ncons, "\b")
+  cat("Number of constituents:", x$ncons, "\n")
   cat("Summary of source contributions:\n")
   
   print(x$summ)

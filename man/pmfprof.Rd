@@ -10,7 +10,7 @@
 pmfprof(x, ...)
 
 \method{pmfprof}{default}(dat, dir = "./", rms = NULL, prefix,
-  constrain = F, cn = NULL, scale = F)
+  constrain = F, cn = NULL, scale = F, sep = ",")
 
 \method{print}{pmfprof}(x)
 

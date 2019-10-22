@@ -24,9 +24,9 @@ pmfprof <- function(x, ...) UseMethod("pmfprof")
 #' @rdname pmfprof
 #' @export
 pmfprof.default <- function(dat, dir = "./", rms = NULL, prefix, constrain = F, 
-                             cn = NULL, scale = F) {
+                             cn = NULL, scale = F, sep  = ",") {
   # read in constituent data
-  dat <- read.table(dat, header = T)
+  dat <- read.table(dat, header = T, sep = sep)
   
   # remove constituents from original data
   if(!is.null(rms)) {
